@@ -116,7 +116,7 @@ const useCapacity = (data) => {
       }
 
       if (entry && entry.ocpWeeks) {
-        current.trWeeks = parseFloat(entry.trWeeks)
+        current.ocpWeeks = parseFloat(entry.ocpWeeks)
       }
 
       if (entry && entry.trCommit) {
