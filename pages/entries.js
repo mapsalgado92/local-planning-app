@@ -77,6 +77,7 @@ const Entries = (props) => {
     setEntry(null)
     setLoaded(false)
     setFormInfo({})
+    setUploaded(null)
 
     if (type === "project") {
       setSelected({ project: item, lob: null, capPlan: null, week: null })
@@ -146,7 +147,9 @@ const Entries = (props) => {
           .catch()
 
         if (existing.length === 1) {
-          newEntry = { ...existing, ...item }
+          console.log("EXISTING ENTRY!!!!")
+          newEntry = { ...existing[0], ...item }
+          console.log(newEntry)
         } else if (existing.length === 0) {
           newEntry = {
             capPlan: selected.capPlan._id,
@@ -157,7 +160,7 @@ const Entries = (props) => {
           return -1
         }
 
-        console.log("NEW ENTRY", newEntry)
+        console.log("WILL UPLOAD ENTRY", newEntry)
 
         fetch("/api/capEntries", {
           method: "POST",
