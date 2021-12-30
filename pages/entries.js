@@ -11,6 +11,7 @@ import {
   Button,
   Tabs,
   Tab,
+  Spinner,
 } from "react-bootstrap"
 import CSVUploader from "../components/entries/CSVUploader"
 import useCapacity from "../hooks/useCapacity"
@@ -28,6 +29,7 @@ const Entries = (props) => {
   const [loaded, setLoaded] = useState(false)
   const [formInfo, setFormInfo] = useState({})
   const [uploaded, setUploaded] = useState(null)
+  const [uploading, setUploading] = useState(false)
 
   const capacity = useCapacity(data)
 
@@ -134,6 +136,48 @@ const Entries = (props) => {
     capacity.rawUpdate(selected.capPlan)
 
     handleSelect(selected.week, "week")
+  }
+
+  const handleSubmitBulk = async () => {
+    setUploading(true)
+    if (uploaded.length > 0) {
+      for (const item of uploaded) {
+        let newEntry = {}
+        let existing = await fetch(
+          `api/capEntries/capPlan=${item.capPlan}/week=${item.week}`
+        )
+          .then((data) => data.json())
+          .catch()
+
+        if (existing.length === 1) {
+          console.log("EXISTING ENTRY!!!!")
+          newEntry = { ...existing[0], ...item }
+          console.log(newEntry)
+        } else if (existing.length === 0) {
+          newEntry = {
+            capPlan: item.capPlan,
+            ...item,
+          }
+        } else {
+          console.log("DUPLICATED ENTRIES")
+          return -1
+        }
+
+        console.log("WILL UPLOAD ENTRY", newEntry)
+
+        fetch("/api/capEntries", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            item: newEntry,
+          }),
+        })
+      }
+    }
+    setUploading(false)
   }
 
   const handleSubmitUpload = async () => {
@@ -299,6 +343,7 @@ const Entries = (props) => {
               <CSVUploader
                 loadedHandler={(csv) => handleUploadCSV(csv)}
                 removeHandler={() => setUploaded(null)}
+                label="week (YYYYw#) - fieldName 1 - [...fieldName N]"
               ></CSVUploader>
               <br />
               {uploaded && (
@@ -321,14 +366,63 @@ const Entries = (props) => {
               )}
               <br />
               <Row>
-                <Col xs={4} className="mx-auto">
+                <Col xs={4} className="mx-auto d-flex justify-content-center">
                   <Button
                     size="sm"
-                    className="w-100"
                     onClick={handleSubmitUpload}
                     disabled={!uploaded || !selected.capPlan}
                   >
                     Submit Upload
+                  </Button>
+                </Col>
+              </Row>
+              <br />
+            </Tab>
+            <Tab eventKey="bulk" title="bulk">
+              <br />
+              <br />
+              <CSVUploader
+                loadedHandler={(csv) => handleUploadCSV(csv)}
+                removeHandler={() => setUploaded(null)}
+                label="capPlan (capPlan ID) - week (YYYYw#) - fieldName 1 (value) - [...fieldName N ]"
+              ></CSVUploader>
+              <br />
+              {uploaded && (
+                <Row className="justify-content-center">
+                  <Col xs={12} className="text-center">
+                    <h5>Entries:</h5>
+                    <p>{uploaded.length}</p>
+                  </Col>
+                  {Object.keys(uploaded[0]).map((field, index) => (
+                    <Col
+                      key={"entry-field-" + index}
+                      xs={2}
+                      className="text-center"
+                    >
+                      <h5>Field {index}</h5>
+                      <p>{field}</p>
+                    </Col>
+                  ))}
+                </Row>
+              )}
+              <br />
+              <Row>
+                <Col xs={4} className="mx-auto d-flex justify-content-center">
+                  <Button
+                    size="sm"
+                    onClick={handleSubmitBulk}
+                    disabled={!uploaded || !uploaded[0].capPlan}
+                  >
+                    Submit Bulk
+                    <Spinner
+                      animation="border"
+                      role="status"
+                      hidden={!uploading}
+                      size="sm"
+                      className="ms-3"
+                    >
+                      <span className="visually-hidden">Loading...</span>
+                    </Spinner>
                   </Button>
                 </Col>
               </Row>

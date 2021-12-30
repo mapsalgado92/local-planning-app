@@ -9,9 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.15",
+    "@mui/material": "^5.2.5",
+    "@mui/x-data-grid": "^5.2.1",
+    "ag-grid-community": "^26.2.1",
+    "ag-grid-react": "^26.2.0",
     "bootstrap": "^5.0.0-beta3",
     "mongodb": "^3.5.9",
     "next": "^11.1.0",
