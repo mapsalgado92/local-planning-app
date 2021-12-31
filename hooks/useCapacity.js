@@ -37,6 +37,8 @@ const useCapacity = (data) => {
     current.trWeeks = parseInt(current.entry.trWeeks)
     current.ocpWeeks = parseInt(current.entry.ocpWeeks)
     current.billableFTE = parseInt(current.entry.billable)
+    current.budgetFTE = parseInt(current.entry.budget)
+    console.log("CURRENT BUDGET", current.budgetFTE, "ENTRY BUDGET", current.entry.budget, "CURRENT ENTRY", current.entry)
     current.fcTrAttrition = parseFloat(current.entry.fcTrAttrition)
 
     let newPlan = weeks.map((week) => {
@@ -47,6 +49,7 @@ const useCapacity = (data) => {
         totalHC: current.totalHC,
         totalFTE: current.totalFTE,
         billableFTE: current.billableFTE,
+        budgetFTE: current.budgetFTE,
         requiredFTE: current.requiredFTE,
         trainees: 0,
         nesting: 0,
@@ -115,6 +118,10 @@ const useCapacity = (data) => {
 
       if (entry && entry.billable) {
         newPlanWeek.billableFTE = parseFloat(entry.billable)
+      }
+
+      if (entry && entry.budget) {
+        newPlanWeek.budgetFTE = parseFloat(entry.budget)
       }
 
       if (entry && entry.trWeeks) {
